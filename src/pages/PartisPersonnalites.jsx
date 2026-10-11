@@ -17,8 +17,12 @@ import '../styles/main.css';
 
 /* ---------- données d'indexation (position réelle + métadonnées) ------- */
 const INDEX = {
+  /* les courants portent une `key` (identifiant courant), pas d'`id` :
+     on normalise l'identifiant commun pour la clé React, la recherche et
+     les textes de source (SOURCE_TEXTS est indexée par key de courant) */
   currents: currents.map(c => ({
     ...c,
+    id: c.key,
     type: 'courant',
     section: c.family,
   })),

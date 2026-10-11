@@ -166,7 +166,10 @@ function QuestionScreen({
           classes) sur fond opaque ivoire et reste sélectionnable. Le contrôle
           explicite vit juste sous l'énoncé, lié à cette question. */}
       <div className={`question-dual${kidsView && kidsRewrite ? ' kids-on' : ''}`}>
-        <h2 className="quiz-question reveal">{statement}</h2>
+        {/* pas de classe « reveal » ici : l'observateur useReveal n'existe que
+            sur la page d'accueil ; sans lui, l'élément resterait invisible
+            (opacity 0) et recouvrirait le contrôle de simplification. */}
+        <h2 className="quiz-question">{statement}</h2>
         {kidsRewrite && (
           <div className="question-kids">
             <h2 className="quiz-question">{kidsRewrite.statement}</h2>

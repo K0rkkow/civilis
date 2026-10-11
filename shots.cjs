@@ -126,18 +126,24 @@ const seedAnswers = `
     check('questionnaire : parcours profil → consentement → questions', inQuestions > 0);
     if (!inQuestions) await page.screenshot({ path: `${OUT}/quiz-debug.png` });
 
-    const hourglass = await page.locator('.quiz-hourglass').count();
-    check('questionnaire : sablier présent', hourglass > 0);
-    const t1 = await page.evaluate(() => getComputedStyle(document.querySelector('.quiz-hourglass-rotor')).transform);
+    const hourglass = await page.locator('.quiz-progress-hg .quiz-hourglass-rotor').count();
+    check('questionnaire : sablier présent (sur le repère de progression)', hourglass > 0);
+    const t1 = await page.evaluate(() => getComputedStyle(document.querySelector('.quiz-progress-hg .quiz-hourglass-rotor')).transform);
     await page.waitForTimeout(400);
-    const t2 = await page.evaluate(() => getComputedStyle(document.querySelector('.quiz-hourglass-rotor')).transform);
+    const t2 = await page.evaluate(() => getComputedStyle(document.querySelector('.quiz-progress-hg .quiz-hourglass-rotor')).transform);
     check('questionnaire : le sablier tourne', t1 !== t2, `${t1} → ${t2}`);
     check('questionnaire : progression numérique conservée', (await page.locator('.quiz-count').innerText()).includes('Question'));
     await page.screenshot({ path: `${OUT}/quiz.png` });
 
-    // on avance jusqu'à une question illustrée (école)
+    // on avance jusqu'à une question illustrée (école) — les écrans de
+    // transition de chapitre sont franchis par leur bouton « Continuer »
     let illu = false;
-    for (let i = 0; i < 62; i++) {
+    for (let i = 0; i < 80; i++) {
+      if (await page.locator('.chapter-transition').count()) {
+        await page.locator('.chapter-transition-btn').click();
+        await page.waitForTimeout(300);
+        continue;
+      }
       const has = await page.locator('.quiz-illustration img').count();
       if (has) { illu = true; break; }
       const choice = page.locator('.quiz-choice').first();
@@ -150,9 +156,11 @@ const seedAnswers = `
     if (illu) {
       const loaded = await page.evaluate(() => {
         const img = document.querySelector('.quiz-illustration img');
-        return img ? { complete: img.complete, w: img.naturalWidth, alt: img.alt.length > 10, cap: !!img.closest('figure').querySelector('figcaption').textContent } : null;
+        return img ? { w: img.naturalWidth, alt: img.alt.length > 10, cap: !!img.closest('figure').querySelector('figcaption').textContent } : null;
       });
-      check('questionnaire : image chargée + alternative + crédit', loaded && loaded.complete && loaded.w > 0 && loaded.alt && loaded.cap,
+      /* naturalWidth > 0 = image réellement chargée et décodée (la propriété
+         `complete` peut rester fausse avec loading="lazy" + cache) */
+      check('questionnaire : image chargée + alternative + crédit', loaded && loaded.w > 0 && loaded.alt && loaded.cap,
         loaded ? `${loaded.w}px` : '');
       await page.screenshot({ path: `${OUT}/quiz-illustration.png` });
     }
