@@ -1,0 +1,19 @@
+# Dépendances et build
+node_modules/
+dist/
+
+# Tests locaux
+test-results/
+
+# Environnement et secrets — JAMAIS commités
+.env
+.env.*
+*.local
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Éditeurs
+.vscode/
+.idea/

@@ -1,0 +1,252 @@
+/* ============================================================================
+   CIVILIS — collage de lettres découpées (« ransom note » éditorial)
+   ----------------------------------------------------------------------------
+   Chaque caractère est un fragment de papier découpé un à un dans un journal,
+   un magazine ou une page imprimée. La palette reste contrôlée et antique :
+   ivoire · crème · beige · papier journal grisé · papier vieilli · noir
+   d'impression. Les variations viennent du papier, de la tranche de découpe,
+   de la typographie, des marges, de l'encre, de la rotation et du décalage —
+   jamais de couleurs saturées ni d'effet néon.
+   ========================================================================== */
+
+/* -------- 1. squelette d'un fragment ------------------------------------- */
+.cut {
+  --rot: 0deg;
+  --dx: 0em;
+  --dy: 0em;
+  --sc: 1;
+  --fs: 1;
+  --mg: 0.02em;
+  --d: 0ms;
+  position: relative;
+  display: inline-block;
+  margin-inline: var(--mg);
+  transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(var(--sc));
+  /* l'ombre suit la silhouette découpée (clip-path de l'enfant) */
+  filter: drop-shadow(0 1px 1.5px rgba(33, 30, 25, 0.26)) drop-shadow(0 0 0.5px rgba(33, 30, 25, 0.14));
+}
+
+.cut-word {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  max-width: 100%;
+}
+.cut-group { display: inline-flex; align-items: baseline; max-width: 100%; }
+
+/* ponctuation non découpée : elle reste sur la page d'origine */
+.cut-punct {
+  display: inline-block;
+  font-family: var(--serif);
+  font-weight: 600;
+  color: var(--ink-deep);
+  opacity: 0.85;
+  padding-inline: 0.05em;
+  transform: translateY(0.1em);
+}
+
+/* le rectangle de papier */
+.cut-paper {
+  position: relative;
+  isolation: isolate;           /* l'encre se mélange à SON papier */
+  display: inline-block;
+  font-size: calc(1em * var(--fs));
+  font-style: normal;
+  letter-spacing: normal;
+  line-height: 1.05;
+  padding: 0.13em 0.16em 0.16em;
+  color: var(--cut-ink, #1a1611);
+  background-color: var(--cut-paper-b, #efe4ce);
+  background-image:
+    repeating-linear-gradient(96deg, rgba(48, 39, 31, 0.035) 0 1px, rgba(48, 39, 31, 0) 1px 6px),
+    radial-gradient(130% 95% at 12% 0%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(158deg, var(--cut-paper-a, #fbf6ea), var(--cut-paper-b, #efe4ce));
+  box-shadow: inset 0 0 0 1px rgba(48, 39, 31, 0.07);
+  animation: cutIn 0.52s cubic-bezier(0.2, 0.85, 0.3, 1) var(--d) both;
+}
+
+.cut-glyph {
+  position: relative;
+  display: inline-block;
+  mix-blend-mode: multiply;     /* l'encre semble imprégnée dans les fibres */
+}
+
+/* -------- 2. teintes de papier ------------------------------------------- */
+.pp-ivory { --cut-paper-a: #fcf8ef; --cut-paper-b: #f2ebdb; }
+.pp-cream { --cut-paper-a: #f8f0da; --cut-paper-b: #ece0c2; }
+.pp-white { --cut-paper-a: #fdfcf8; --cut-paper-b: #f3f0e7; }
+.pp-linen { --cut-paper-a: #f4eee0; --cut-paper-b: #e7ddc7; }
+.pp-beige { --cut-paper-a: #f0e4ca; --cut-paper-b: #e0d0ac; }
+.pp-news  { --cut-paper-a: #ebe8de; --cut-paper-b: #dad6c9; }
+.pp-grey  { --cut-paper-a: #e4e0d4; --cut-paper-b: #d2cec0; }
+.pp-aged  { --cut-paper-a: #efdfb7; --cut-paper-b: #dac693; }
+/* coupes sombres : titres de magazine, fonds d'impression anciens */
+.pp-ink   { --cut-paper-a: #2c2721; --cut-paper-b: #17140f; --cut-ink: #f0e7d3; }
+.pp-brown { --cut-paper-a: #55402c; --cut-paper-b: #3a2c1e; --cut-ink: #f2e8d4; }
+
+/* -------- 3. encres ------------------------------------------------------- */
+.ik-black { --cut-ink: #16120d; }
+.ik-brown { --cut-ink: #3b2c1d; }
+.ik-grey  { --cut-ink: #34322c; }
+.ik-fade  { --cut-ink: #4b4136; }
+
+/* -------- 4. typographies (alphabets découpés dans des sources diverses) -- */
+.cf-garamond { font-family: 'Cormorant Garamond', Garamond, Georgia, serif; }
+.cf-playfair { font-family: 'Playfair Display', 'Times New Roman', Georgia, serif; }
+.cf-spectral { font-family: 'Spectral', Georgia, 'Times New Roman', serif; }
+.cf-georgia  { font-family: Georgia, 'Times New Roman', serif; }
+.cf-times    { font-family: 'Times New Roman', Times, serif; }
+.cf-palatino { font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif; }
+.cf-sans     { font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif; }
+.cf-oswald   { font-family: 'Oswald', 'Arial Narrow', Arial, sans-serif; }
+.cf-black    { font-family: 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-synthesis: none; }
+.cf-impact   { font-family: Impact, Haettenschweiler, 'Franklin Gothic Bold', 'Arial Narrow', sans-serif; font-synthesis: none; }
+.cf-type     { font-family: 'Courier New', Courier, monospace; }
+.cf-ital     { font-family: 'Cormorant Garamond', Garamond, Georgia, serif; font-style: italic; }
+
+/* -------- 5. tranches de découpe (ciseaux, jamais mécaniques) ------------ */
+.eg-1 { clip-path: polygon(0 2px, calc(100% - 2px) 0, 100% calc(100% - 3px), 3px 100%); }
+.eg-2 { clip-path: polygon(2px 0, 100% 3px, calc(100% - 3px) 100%, 0 calc(100% - 2px)); }
+.eg-3 { clip-path: polygon(0 0, 100% 2px, calc(100% - 4px) calc(100% - 1px), 2px 100%); }
+.eg-4 { clip-path: polygon(3px 1px, calc(100% - 1px) 0, 100% calc(100% - 4px), 0 calc(100% - 2px)); }
+.eg-5 { clip-path: polygon(0 3px, 100% 0, calc(100% - 2px) 100%, 1px calc(100% - 3px)); }
+.eg-6 { clip-path: polygon(1px 0, calc(100% - 3px) 2px, 100% calc(100% - 2px), 2px calc(100% - 1px)); }
+.eg-7 { clip-path: polygon(4px 0, 100% 3px, calc(100% - 4px) 100%, 0 calc(100% - 3px)); }
+/* bandes arrachées : le papier a été déchiré, pas découpé au millimètre */
+.eg-8 {
+  clip-path: polygon(
+    0 2px, 9% 0, 21% 2px, 34% 0, 47% 2px, 61% 0, 74% 2px, 87% 0, 100% 2px,
+    100% calc(100% - 2px), 87% 100%, 74% calc(100% - 2px), 61% 100%, 47% calc(100% - 2px),
+    34% 100%, 21% calc(100% - 2px), 9% 100%, 0 calc(100% - 2px)
+  );
+}
+.eg-9 {
+  clip-path: polygon(
+    0 0, 100% 0, 100% 100%, 88% calc(100% - 2px), 74% 100%, 60% calc(100% - 2px),
+    46% 100%, 32% calc(100% - 2px), 18% 100%, 5% calc(100% - 2px), 0 100%
+  );
+}
+
+/* -------- 6. marges de découpe (irrégulières) ---------------------------- */
+.pd-0 { padding: 0.09em 0.13em 0.13em; }
+.pd-1 { padding: 0.17em 0.21em 0.19em; }
+.pd-2 { padding: 0.06em 0.11em 0.12em; }
+.pd-3 { padding: 0.21em 0.25em 0.16em; }
+.pd-4 { padding: 0.14em 0.26em 0.15em; }
+
+/* -------- 7. texture et contraste (légèrement différents) ---------------- */
+.cut-paper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.tx-lines::after {
+  background: repeating-linear-gradient(0deg, rgba(48, 39, 31, 0.04) 0 1px, rgba(48, 39, 31, 0) 1px 7px);
+}
+.tx-fiber::after {
+  background:
+    repeating-linear-gradient(45deg, rgba(48, 39, 31, 0.045) 0 1px, rgba(48, 39, 31, 0) 1px 7px),
+    repeating-linear-gradient(-45deg, rgba(48, 39, 31, 0.035) 0 1px, rgba(48, 39, 31, 0) 1px 9px);
+}
+.tx-halftone::after {
+  background-image: radial-gradient(rgba(33, 30, 25, 0.07) 0.7px, rgba(33, 30, 25, 0) 0.8px);
+  background-size: 4px 4px;
+}
+.tx-gloss::after {
+  background: linear-gradient(105deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 48%);
+}
+.tx-crease::after {
+  background: linear-gradient(180deg, rgba(48, 39, 31, 0) 44%, rgba(48, 39, 31, 0.07) 50%, rgba(48, 39, 31, 0) 56%);
+}
+.tx-speck::after {
+  background:
+    radial-gradient(circle at 22% 28%, rgba(48, 39, 31, 0.09) 0.5px, rgba(48, 39, 31, 0) 1.4px),
+    radial-gradient(circle at 68% 64%, rgba(48, 39, 31, 0.08) 0.5px, rgba(48, 39, 31, 0) 1.6px),
+    radial-gradient(circle at 82% 22%, rgba(48, 39, 31, 0.06) 0.5px, rgba(48, 39, 31, 0) 1.2px);
+}
+.pp-ink::after, .pp-brown::after { background: none; }
+
+/* — la lettre a été découpée À L'INTÉRIEUR d'un mot : on aperçoit parfois
+     un fragment du voisin, comme sur un vrai collage de journal — */
+.cut-paper::before {
+  content: var(--ghost, '');
+  position: absolute;
+  top: 50%;
+  left: var(--ghost-x, -0.45em);
+  transform: translateY(-50%);
+  font: inherit;
+  color: rgba(48, 39, 31, 0.16);
+  pointer-events: none;
+}
+.pp-ink::before, .pp-brown::before { color: rgba(240, 231, 211, 0.2); }
+
+/* — certains fragments sont collés sur un bout de papier vierge, comme sur une
+     planche de montage où l'on empile les coupures — */
+.cut-scrap {
+  position: absolute;
+  left: -0.17em;
+  right: -0.21em;
+  top: -0.15em;
+  bottom: -0.17em;
+  z-index: -1;
+  background-color: #e7dcc2;
+  background-image: repeating-linear-gradient(96deg, rgba(48, 39, 31, 0.05) 0 1px, rgba(48, 39, 31, 0) 1px 4px);
+  clip-path: polygon(0 2px, calc(100% - 3px) 0, 100% calc(100% - 2px), 2px 100%);
+  box-shadow: 0 1px 1.5px rgba(33, 30, 25, 0.16);
+  transform: rotate(var(--sr)) translate(var(--sx), var(--sy)) scale(var(--ss));
+}
+.cut-scrap.scrap-grey { background-color: #e3dfd2; }
+.cut-scrap.scrap-aged { background-color: #e9d7ab; }
+
+/* variations de contraste / d'âge, sans jamais nuire à la lisibilité */
+.cut.fx-print { filter: drop-shadow(0 1px 1.5px rgba(33, 30, 25, 0.26)) drop-shadow(0 0 0.5px rgba(33, 30, 25, 0.14)) contrast(1.05) saturate(0.94); }
+.cut.fx-aged  { filter: drop-shadow(0 1px 1.5px rgba(33, 30, 25, 0.26)) drop-shadow(0 0 0.5px rgba(33, 30, 25, 0.14)) sepia(0.16) contrast(0.97) brightness(0.99); }
+.cut.fx-flat  { filter: drop-shadow(0 1px 2px rgba(33, 30, 25, 0.22)) saturate(0.9); }
+
+/* -------- 8. apparition progressive -------------------------------------- */
+@keyframes cutIn {
+  0%   { opacity: 0; transform: translateY(-0.4em) rotate(calc(var(--rot) * -1.4)) scale(0.72); }
+  55%  { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+
+/* -------- 9. contexts d'usage -------------------------------------------- */
+/* l'intro : le titre CIVILIS tient dans le viewport, même à 320 px */
+.intro-screen {
+  overflow: hidden;
+  background-color: var(--ivory);
+  /* fond de planche de montage : grain de papier très discret + vignette */
+  background-image:
+    repeating-linear-gradient(90deg, rgba(48, 39, 31, 0.014) 0 1px, rgba(48, 39, 31, 0) 1px 7px),
+    radial-gradient(120% 90% at 50% 45%, rgba(255, 255, 255, 0.55), rgba(48, 39, 31, 0.05) 72%, rgba(48, 39, 31, 0.09) 100%);
+}
+.intro-inner {
+  width: min(100% - 2rem, 760px);
+  padding-inline: clamp(0.5rem, 3vw, 1rem);
+}
+.intro-kicker, .intro-title, .intro-sub { max-width: 100%; }
+
+/* l'accroche : quelques mots découpés au milieu de la phrase */
+.hero-lead .cut-word { margin-inline: 0.02em; }
+.hero-lead .cut-punct { font-family: var(--body); font-weight: 400; }
+
+/* -------- 10. responsive -------------------------------------------------- */
+@media (max-width: 560px) {
+  .intro-title { font-size: clamp(2.1rem, 8.8vw, 3.4rem); }
+  .intro-sub { font-size: 1rem; }
+  .intro-kicker { font-size: 0.7rem; letter-spacing: 0.24em; }
+  .intro-enter { width: 100%; justify-content: center; padding: 1rem 1.2rem; }
+  .cut { --mg: 0.005em; }
+}
+
+/* -------- 11. mouvement réduit ------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .cut-paper {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  /* l'intro reste lisible : elle est simplement figée, déjà composée */
+  .intro-inner, .intro-rule { animation: none !important; opacity: 1 !important; }
+}

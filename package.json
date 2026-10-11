@@ -1,0 +1,26 @@
+{
+  "name": "civilis",
+  "version": "2.0.0",
+  "description": "CIVILIS — parcours de réflexion politique : questionnaire multidimensionnel, moteur explicite, portrait éditorial.",
+  "private": true,
+  "type": "module",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite --port 3000",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test tests/engine.test.mjs tests/regression.test.mjs tests/kids.test.mjs tests/guard.test.mjs tests/chapters.test.mjs tests/robustness.test.mjs"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@vitejs/plugin-react": "^3.0.0",
+    "playwright": "^1.64.0",
+    "vite": "^4.0.0"
+  }
+}

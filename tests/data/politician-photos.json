@@ -1,0 +1,12 @@
+[
+  { "id": "bardella", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Jordan_Bardella_December_2022.jpg/960px-Jordan_Bardella_December_2022.jpg" },
+  { "id": "lepen", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Marine_Le_Pen_VIVA_24_%282%29_%28cropped%29.jpg/960px-Marine_Le_Pen_VIVA_24_%282%29_%28cropped%29.jpg" },
+  { "id": "melenchon", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Jean-Luc_M%C3%A9lenchon_2022_%28cropped%29.jpg/960px-Jean-Luc_M%C3%A9lenchon_2022_%28cropped%29.jpg" },
+  { "id": "glucksmann", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/2024-03-03_-_Congr%C3%A8s_du_PSE-_105_-_Raphael_Glucksmann.jpg/960px-2024-03-03_-_Congr%C3%A8s_du_PSE-_105_-_Raphael_Glucksmann.jpg" },
+  { "id": "attal", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Gabriel_Attal_%28cropped%29.jpg/960px-Gabriel_Attal_%28cropped%29.jpg" },
+  { "id": "ruffin", "url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Fran%C3%A7ois_Ruffin_%28cropped%29.jpg" },
+  { "id": "philippe", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/%C3%89douard_Philippe_%C3%A0_Ch%C3%A2lons-en-Champagne_en_2023._%28cropped%29.jpg/960px-%C3%89douard_Philippe_%C3%A0_Ch%C3%A2lons-en-Champagne_en_2023._%28cropped%29.jpg" },
+  { "id": "hollande", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Fran%C3%A7ois_Hollande_-_2017_%2827869823159%29_%28cropped_2%29.jpg/960px-Fran%C3%A7ois_Hollande_-_2017_%2827869823159%29_%28cropped_2%29.jpg" },
+  { "id": "tondelier", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Huma2023MarineTondelier.jpg/960px-Huma2023MarineTondelier.jpg" },
+  { "id": "roussel", "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Fabien_Roussel_2022.jpg/960px-Fabien_Roussel_2022.jpg" }
+]

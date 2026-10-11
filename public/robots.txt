@@ -1,0 +1,8 @@
+# CIVILIS — robots.txt
+# Toutes les pages publiques sont indexables. Le site ne collecte aucune
+# donnée personnelle : aucune page n'est à protéger de l'indexation.
+User-agent: *
+Allow: /
+
+# Sitemap : à activer quand le domaine de production sera connu
+# Sitemap: https://VOTRE-DOMAINE/sitemap.xml

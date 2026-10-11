@@ -1,0 +1,338 @@
+/* ============================================================================
+   CIVILIS — questionnaire
+   ========================================================================== */
+
+.quiz-container { padding: 2.5rem 0 4rem; }
+.quiz-screen { display: flex; flex-direction: column; gap: 1.2rem; animation: qIn .45s ease both; }
+@keyframes qIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+.quiz-step-label { font-size: .78rem; text-transform: uppercase; letter-spacing: .2em; color: var(--gold); font-weight: 600; }
+.quiz-screen h2 { font-size: clamp(1.6rem, 4vw, 2.2rem); }
+
+.quiz-context { font-size: 1.04rem; max-width: 42rem; margin-top: .6rem; }
+.quiz-context-oc { font-style: italic; color: var(--ink); }
+.quiz-context-symbol { font-size: 1rem; color: var(--gold); transition: transform .2s; }
+.quiz-context-card { cursor: pointer; padding: .4rem 0; }
+.quiz-context-card:hover .quiz-context-symbol { transform: scaleY(1.2); }
+
+/* progression : nombres, pourcent, repères de dimension */
+.quiz-progress-row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.quiz-theme-badge { font-size: .8rem; text-transform: uppercase; letter-spacing: .14em; color: var(--terra); font-weight: 600; }
+.quiz-count { font-family: var(--serif); font-size: 1rem; color: var(--stone); white-space: nowrap; display: inline-flex; align-items: center; gap: 0.5rem; }
+/* sablier : rotation continue, purement décorative — la progression réelle reste
+   donnée par le compteur de question, le pourcentage et la barre */
+.quiz-hourglass-rotor {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hourglassTurn 3.6s linear infinite;
+}
+@keyframes hourglassTurn { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* sablier antique doré, placé à côté du point-repère de la barre : il suit le
+   point au fil de la progression. En fin de parcours (≥ 88 %) il passe à
+   gauche du point pour ne jamais sortir du conteneur, à toutes les largeurs. */
+.quiz-progress-hg {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  color: var(--gold); line-height: 0; pointer-events: none;
+}
+.quiz-progress-hg.hg-out { left: 100%; margin-left: 20px; }
+.quiz-progress-hg.hg-in  { right: 20px; }
+/* légère bascule élégante pendant que le sablier tourne */
+.quiz-hg-wobble { display: inline-flex; animation: hgWobble 4.8s ease-in-out infinite alternate; }
+@keyframes hgWobble { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .quiz-hourglass-rotor, .quiz-hg-wobble { animation: none !important; }
+}
+
+/* -------- illustration de la question ---------------------------------- */
+/* Bande éditoriale : courte, cadrée, créditée. Elle situe le sujet sans
+   pousser la question hors de l'écran ni rendre les options difficiles à
+   atteindre. */
+.quiz-illustration {
+  display: grid;
+  gap: 0.6rem;
+  margin: 1.4rem 0 1.6rem;
+}
+.quiz-illustration[data-count="2"] { grid-template-columns: 1fr 1fr; }
+.quiz-illustration-item { margin: 0; position: relative; }
+.quiz-illustration-item img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  filter: saturate(0.92) contrast(1.02);
+  border: 1px solid var(--line-soft);
+}
+.quiz-illustration-item figcaption {
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  font-style: italic;
+  color: var(--stone);
+  line-height: 1.45;
+}
+.quiz-illustration-item.img-failed img { display: none; }
+.quiz-illustration-item.img-failed {
+  min-height: 90px;
+  background: linear-gradient(135deg, var(--paper) 25%, transparent 25%),
+              linear-gradient(225deg, var(--paper) 25%, transparent 25%);
+  background-size: 22px 22px;
+}
+.quiz-illustration-item.img-failed figcaption::after {
+  content: ' — image momentanément indisponible';
+  font-style: normal;
+}
+@media (max-width: 700px) {
+  .quiz-illustration[data-count="2"] { grid-template-columns: 1fr; }
+  .quiz-illustration-item img { height: 132px; }
+}
+.quiz-progress-bar { position: relative; height: 8px; background: var(--line-soft); overflow: visible; margin-top: .8rem; }
+.quiz-progress-fill {
+  height: 100%; background: var(--gold); transition: width .5s cubic-bezier(.22,1,.36,1);
+  position: relative;
+}
+.quiz-progress-fill::after {
+  content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  width: 12px; height: 12px; background: var(--gold); border-radius: 50%;
+}
+.quiz-progress-percent {
+  position: absolute; right: 12px; top: -2.2rem;
+  font-family: var(--serif); font-size: 1.1rem; font-weight: 700;
+  color: var(--ink-deep);
+}
+.quiz-dimension-hint {
+  font-size: .82rem; color: var(--stone); font-style: italic;
+  max-width: 38rem; margin-top: .2rem; line-height: 1.6;
+}
+
+/* choix */
+.quiz-options { display: flex; flex-direction: column; gap: .8rem; }
+.quiz-choice {
+  display: flex; align-items: center; gap: 1rem; cursor: pointer;
+  border: 1px solid var(--line); padding: 1rem 1.2rem;
+  transition: border-color .2s, background .2s;
+  background: rgba(255,255,255,0.45);
+}
+.quiz-choice:hover { border-color: var(--gold); }
+.quiz-choice input { position: absolute; opacity: 0; }
+.quiz-choice-mark {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 1.5px solid var(--ink); flex-shrink: 0; position: relative;
+  transition: border-color .2s;
+}
+.quiz-choice-mark::after {
+  content: ''; position: absolute; inset: 3px; border-radius: 50%;
+  background: var(--gold); transform: scale(0); transition: transform .18s;
+}
+.quiz-choice.selected { border-color: var(--gold); background: rgba(177,138,67,.07); }
+.quiz-choice.selected .quiz-choice-mark { border-color: var(--gold); }
+.quiz-choice.selected .quiz-choice-mark::after { transform: scale(1); }
+.quiz-choice input:focus-visible ~ .quiz-choice-mark { outline: 2px solid var(--gold); outline-offset: 2px; }
+.quiz-choice-label { font-size: 1rem; line-height: 1.5; }
+.quiz-choice-uncertain { border-style: dashed; background: transparent; }
+.quiz-choice-uncertain .quiz-choice-label { font-style: italic; color: var(--ink); opacity: .85; }
+
+/* nav bas */
+.quiz-nav { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: .6rem; flex-wrap: wrap; }
+
+/* profil facultatif */
+.profile-fieldset { border: none; margin: .4rem 0 1rem; }
+.profile-fieldset legend {
+  font-family: var(--serif); font-size: 1.2rem; color: var(--ink-deep);
+  margin-bottom: .6rem;
+}
+.profile-fieldset .choice {
+  display: inline-flex; align-items: center; gap: .5rem;
+  border: 1px solid var(--line); padding: .45rem .9rem; margin: .25rem .35rem .25rem 0;
+  cursor: pointer; font-size: .93rem; background: rgba(255,255,255,0.35);
+  border-radius: 2px; transition: border-color .2s, background .2s;
+}
+.profile-fieldset .choice:hover { border-color: var(--gold); }
+.profile-fieldset .choice.selected { border-color: var(--gold); background: rgba(177,138,67,.08); }
+.profile-fieldset .choice input { position: absolute; opacity: 0; }
+.profile-fieldset .choice.selected { font-weight: 600; }
+
+/* recap */
+.recap-list { list-style: none; border-top: 1px solid var(--line); }
+.recap-item {
+  display: grid; grid-template-columns: 140px 1fr auto; gap: 1rem; align-items: baseline;
+  width: 100%; text-align: left; padding: .85rem .6rem;
+  background: none; border: none; border-bottom: 1px solid var(--line);
+  cursor: pointer; font-family: var(--body); color: var(--ink); font-size: .95rem;
+}
+.recap-item:hover { background: rgba(177,138,67,.05); }
+.recap-theme { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--stone); }
+.recap-text { font-size: .96rem; color: var(--ink-deep); }
+.recap-answer { color: var(--terra); font-weight: 600; text-align: right; font-size: .9rem; max-width: 220px; }
+.recap-answer.empty { color: var(--stone); font-style: italic; font-weight: 400; }
+.recap-answer.uncertain { color: var(--stone); font-weight: 400; font-style: italic; }
+
+@media (max-width: 700px) {
+  .recap-item { grid-template-columns: 1fr; gap: .3rem; }
+  .recap-answer { text-align: left; max-width: none; }
+}
+
+/* ============================================================================
+   MODE ENFANT (5–12 ans) — parcours pédagogique distinct
+   Mêmes couleurs, même papier : seule la mise en page devient plus claire.
+   ========================================================================== */
+
+/* petite explication « Un impôt, c'est… » au-dessus des réponses */
+.kids-explain-card {
+  border-left: 3px solid var(--gold);
+  background: rgba(255,255,255,.5);
+  padding: .8rem 1.1rem;
+}
+.kids-explain-text { font-size: 1rem; color: var(--ink); line-height: 1.6; margin: 0; }
+
+/* bouton discret « Quitter le mode enfant », à côté du compteur */
+.kids-exit {
+  margin-left: .9rem; font-family: var(--sans); font-size: .72rem;
+  color: var(--stone); background: none; border: 1px solid var(--line);
+  border-radius: 2px; padding: .25rem .6rem; cursor: pointer;
+  transition: color .2s, border-color .2s;
+  white-space: nowrap;
+}
+.kids-exit:hover { color: var(--ink-deep); border-color: var(--gold); }
+@media (max-width: 700px) {
+  .kids-exit { margin-left: 0; margin-top: .3rem; }
+}
+
+/* retour au test classique depuis le récapitulatif enfant */
+.kids-recap-exit { margin-top: .8rem; text-align: right; }
+
+/* ============================================================================
+   MODE TEST CONCENTRÉ — en-tête discret + confirmation de sortie
+   ========================================================================== */
+
+/* en-tête très discret pendant le test : logo, progression, rien d'autre */
+.test-header {
+  position: sticky; top: 0; z-index: 60;
+  background: rgba(246, 240, 228, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line-soft);
+}
+.test-header-content {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; min-height: 54px;
+}
+.test-header-progress {
+  font-family: var(--serif); font-size: .95rem; color: var(--stone);
+  white-space: nowrap;
+}
+.test-header-line {
+  height: 2px; background: var(--gold);
+  transition: width .5s cubic-bezier(.22,1,.36,1);
+}
+@media (max-width: 480px) {
+  .test-header-progress { font-size: .85rem; }
+}
+
+/* fenêtre de confirmation « Tu es en plein test » — fond ivoire opaque :
+   couvre l'écran pendant l'annulation silencieuse d'un Retour navigateur */
+.leave-guard {
+  position: fixed; inset: 0; z-index: 300; /* au-dessus de l'introduction (200) */
+  background: var(--ivory);
+  display: grid; place-items: center;
+  padding: 1.5rem;
+  animation: leaveGuardIn .25s ease both;
+}
+@keyframes leaveGuardIn { from { opacity: 0; } }
+.leave-guard-card {
+  width: 100%; max-width: 30rem;
+  background: rgba(255,255,255,.6);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+  padding: 1.7rem 1.9rem;
+}
+.leave-guard-kicker {
+  font-family: var(--sans); font-size: .74rem; text-transform: uppercase;
+  letter-spacing: .22em; color: var(--gold); font-weight: 600; margin-bottom: .5rem;
+}
+.leave-guard-card h2 { font-size: clamp(1.4rem, 4vw, 1.9rem); margin-bottom: .7rem; }
+.leave-guard-msg { font-size: 1.02rem; line-height: 1.65; color: var(--ink); margin-bottom: 1.2rem; }
+.leave-guard-actions { display: flex; flex-wrap: wrap; gap: .8rem; }
+@media (max-width: 480px) {
+  .leave-guard-actions { flex-direction: column; align-items: stretch; }
+  .leave-guard-actions .btn-ink, .leave-guard-actions .btn-ghost { width: 100%; }
+}
+
+/* ============================================================================
+   TRANSITION ENTRE CHAPITRES — pause éditoriale entre deux thèmes
+   Fond ivoire existant, meandre grec discret en or patiné, bouton Continuer.
+   L'apparition très légère vient de l'animation qIn de .quiz-screen.
+   ========================================================================== */
+
+.chapter-transition {
+  text-align: center;
+  max-width: 36rem;
+  margin-inline: auto;
+  padding: 2.4rem 0 3rem;
+  gap: 1.05rem;
+}
+.chapter-transition .quiz-step-label { margin-bottom: .1rem; }
+.chapter-transition-title {
+  font-size: clamp(1.45rem, 4vw, 2.05rem);
+  line-height: 1.3;
+  margin-bottom: .1rem;
+}
+.chapter-transition-title em { color: var(--gold); }
+.chapter-transition-meander {
+  display: block; color: var(--gold);
+  margin: .15rem auto .1rem;
+}
+.chapter-transition-next { font-size: .98rem; color: var(--stone); margin: 0; }
+.chapter-transition-next-name {
+  font-family: var(--serif); font-size: 1.5rem; font-weight: 600;
+  color: var(--ink-deep); margin: 0 0 .4rem;
+}
+.chapter-transition-btn { margin-top: .5rem; }
+.chapter-transition-meta {
+  font-size: .82rem; color: var(--stone); margin: .9rem 0 0;
+}
+@media (max-width: 480px) {
+  .chapter-transition { padding: 1.6rem 0 2.2rem; }
+  .chapter-transition-next-name { font-size: 1.3rem; }
+}
+
+/* ============================================================================
+   SIMPLIFICATION À LA DEMANDE — contrôle explicite sous l'énoncé
+   ----------------------------------------------------------------------------
+   « Simplifier la question » remplace visuellement l'énoncé classique par sa
+   formulation enfant (superposition propre, fond opaque ivoire) ; « Voir la
+   question originale » le rétablit à l'identique. Seul le clic (ou le
+   clavier) bascule : aucun effet au survol. État actif clairement signalé.
+   ========================================================================== */
+
+.simplify-btn {
+  display: inline-flex; align-items: center; gap: .4rem;
+  margin-top: .4rem;
+  font-family: var(--sans); font-size: .76rem; letter-spacing: .02em;
+  color: var(--stone); background: none;
+  border: 1px solid var(--line); border-radius: 2px;
+  padding: .42rem .8rem; min-height: 34px;
+  cursor: pointer; align-self: flex-start;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.simplify-btn svg { flex: none; }
+.simplify-btn:hover { color: var(--gold); border-color: var(--gold); }
+.simplify-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.simplify-btn.on {
+  color: var(--gold); border-color: var(--gold);
+  background: rgba(177,138,67,.1);
+}
+
+/* deux couches dans le même flux : affichage exclusif, alignement exact
+   (mêmes classes de typographie), l'enfant prend la place de la classique */
+.question-dual { position: relative; }
+.question-kids { display: none; background: var(--ivory); }
+.question-dual.kids-on .question-kids {
+  display: block;
+  animation: kidsIn .18s ease both;
+}
+.question-dual.kids-on > .quiz-question { display: none; }
+@keyframes kidsIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .simplify-btn { transition: none; }
+}
